@@ -4,6 +4,8 @@
 
 **Repository**: [https://github.com/Daniel23-stack/text_api](https://github.com/Daniel23-stack/text_api)
 
+**Live Deployment**: [https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html](https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html)
+
 A RESTful API built with ASP.NET Core 8+ that detects and counts occurrences of English number words (one through nine) within randomized/scrambled text strings using subsequence matching algorithms.
 
 ## Features
@@ -137,6 +139,20 @@ Once the API is running, you can access:
 
 **Note**: If you see certificate warnings in the browser, click "Advanced" and "Proceed anyway" for local development.
 
+### Azure Deployment (Live)
+
+The API is deployed and available on Azure App Service:
+
+- **Live Swagger UI**: [https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html](https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html)
+- **API Base URL**: `https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net`
+
+**Note**: The deployed version includes additional puzzle generator endpoints for testing purposes. The core analysis endpoint (`/api/NumberWordAnalyzer` locally, `/api/PuzzleSolver` on Azure) provides the same functionality.
+
+**API Differences:**
+- **Request Format**: Azure uses `wordSequence` (camelCase) instead of `inputText`
+- **Response Format**: Azure returns an array of objects with `value`, `word`, and `count` properties, and includes "zero" and "ten" in addition to one-nine
+- **Local/Docker**: Uses `inputText` and returns a dictionary with word counts for one-nine only
+
 ### Docker Deployment (Recommended for Full ELK Stack)
 
 #### Step 1: Navigate to Docker Directory
@@ -255,6 +271,7 @@ docker-compose down -v
 
 ### Response
 
+**Local/Docker Response:**
 ```json
 {
   "wordCounts": {
@@ -271,7 +288,36 @@ docker-compose down -v
 }
 ```
 
+**Azure Response (Different Format):**
+```json
+[
+  {
+    "value": 0,
+    "word": "zero",
+    "count": 0
+  },
+  {
+    "value": 1,
+    "word": "one",
+    "count": 12
+  },
+  {
+    "value": 2,
+    "word": "two",
+    "count": 7
+  },
+  ...
+]
+```
+
 ### Example using cURL
+
+**For Azure Deployment (Live):**
+```bash
+curl -X POST "https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/api/PuzzleSolver" \
+  -H "Content-Type: application/json" \
+  -d '{"wordSequence": "eeehffeetsrtiiueuefxxeexeseeetoionneghtvvsentniheinungeiefev"}'
+```
 
 **For Local Development (port 5055):**
 ```bash
@@ -288,6 +334,18 @@ curl -X POST "http://localhost:5000/api/NumberWordAnalyzer" \
 ```
 
 ### Example using PowerShell
+
+**For Azure Deployment (Live):**
+```powershell
+$body = @{
+    wordSequence = "eeehffeetsrtiiueuefxxeexeseeetoionneghtvvsentniheinungeiefev"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/api/PuzzleSolver" `
+    -Method Post `
+    -Body $body `
+    -ContentType "application/json"
+```
 
 **For Local Development (port 5055):**
 ```powershell
@@ -315,6 +373,15 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/NumberWordAnalyzer" `
 
 ### Example using Swagger UI (Easiest Method)
 
+**For Azure (Live):**
+1. Open [https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html](https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html)
+2. Find the `POST /api/PuzzleSolver` endpoint
+3. Click "Try it out"
+4. Enter your input text in the request body
+5. Click "Execute"
+6. View the response with word counts
+
+**For Local/Docker:**
 1. Open `http://localhost:5000/swagger` (Docker) or `http://localhost:5055/swagger` (Local)
 2. Find the `POST /api/NumberWordAnalyzer` endpoint
 3. Click "Try it out"
@@ -475,21 +542,13 @@ docker-compose up -d
 ```
 
 **Access Points:**
+- **Live Azure API**: [https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger](https://numberwordgenerato-f6cedkdngsfje2dc.southafricanorth-01.azurewebsites.net/swagger/index.html)
 - Local API: `http://localhost:5055/swagger`
 - Docker API: `http://localhost:5000/swagger`
 - Elasticsearch: `http://localhost:9200`
 - Kibana: `http://localhost:5601`
 
-## Contributing
 
-1. Fork the repository: [https://github.com/Daniel23-stack/text_api](https://github.com/Daniel23-stack/text_api)
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Make your changes
-4. Add/update tests
-5. Ensure all tests pass: `dotnet test`
-6. Commit your changes: `git commit -m "Add your feature"`
-7. Push to your fork: `git push origin feature/your-feature-name`
-8. Submit a pull request on GitHub
 
 ## Repository
 
